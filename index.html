@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f0e8">
+    <meta name="description" content="A browser-based identity access review workspace for least-privilege and separation-of-duties analysis.">
+    <title>Access Review Lab | Identity Governance</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#mainContent">Skip to access review</a>
+    <header class="topbar" id="top">
+      <a class="brand" href="#top"><span class="brand-symbol" aria-hidden="true">AR</span><span><strong>Access Review Lab</strong><small>Identity governance workspace</small></span></a>
+      <div class="top-actions">
+        <span class="local-note">Data stays in this browser</span>
+        <button class="button outline" id="exportButton" type="button">Export review</button>
+        <button class="button ink" id="addGrantButton" type="button">Add grant</button>
+      </div>
+    </header>
+
+    <main id="mainContent">
+      <section class="hero" aria-labelledby="pageTitle">
+        <div class="hero-copy">
+          <p class="kicker">Quarterly access certification / Q3</p>
+          <h1 id="pageTitle">Make every access decision explainable.</h1>
+          <p>Inspect who has access to what, surface toxic combinations and stale privileges, then leave a review trail that another person can follow.</p>
+        </div>
+        <aside class="review-card" aria-label="Review progress">
+          <div><span>Review date</span><strong id="reviewDate"></strong></div>
+          <div class="progress-label"><span>Decision progress</span><strong id="progressText">0%</strong></div>
+          <div class="progress-track" role="progressbar" aria-label="Access findings reviewed" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="progressBar"></span></div>
+          <div class="data-actions">
+            <button class="text-button" id="importFileButton" type="button">Import CSV or JSON</button>
+            <input id="fileInput" type="file" accept=".csv,.json,text/csv,application/json" aria-label="Import access review file" hidden>
+            <button class="text-button" id="demoButton" type="button">Reset sample</button>
+          </div>
+          <p id="loadStatus" role="status" aria-live="polite">Sample directory loaded.</p>
+        </aside>
+      </section>
+
+      <section class="summary-grid" aria-label="Access review summary">
+        <article><span>Identities</span><strong id="identityMetric">0</strong><small>people and services</small></article>
+        <article><span>Resources</span><strong id="resourceMetric">0</strong><small>systems in scope</small></article>
+        <article class="risk-metric"><span>Open findings</span><strong id="findingMetric">0</strong><small>require a decision</small></article>
+        <article><span>Reviewed</span><strong id="reviewedMetric">0</strong><small>documented outcomes</small></article>
+      </section>
+
+      <section class="review-workspace" aria-labelledby="workspaceTitle">
+        <div class="workspace-header">
+          <div><p class="kicker">Evidence workspace</p><h2 id="workspaceTitle">Access certification</h2></div>
+          <div class="tabs" role="tablist" aria-label="Access review views">
+            <button id="findingsTab" role="tab" aria-selected="true" aria-controls="findingsPanel">Findings</button>
+            <button id="matrixTab" role="tab" aria-selected="false" aria-controls="matrixPanel" tabindex="-1">Matrix</button>
+            <button id="grantsTab" role="tab" aria-selected="false" aria-controls="grantsPanel" tabindex="-1">Grants</button>
+          </div>
+        </div>
+
+        <section id="findingsPanel" role="tabpanel" aria-labelledby="findingsTab">
+          <form class="filters" id="filterForm" role="search">
+            <label class="search"><span>Search findings</span><input id="searchInput" type="search" placeholder="Identity, resource, issue…"></label>
+            <label><span>Control area</span><select id="kindFilter"><option value="">All areas</option></select></label>
+            <label><span>Severity</span><select id="severityFilter"><option value="">All severities</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option></select></label>
+          </form>
+          <div class="finding-table-wrap">
+            <table class="finding-table">
+              <thead><tr><th>Finding</th><th>Control area</th><th>Affected access</th><th>Decision</th></tr></thead>
+              <tbody id="findingRows"></tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="findingEmpty" hidden>No findings match these filters.</div>
+        </section>
+
+        <section id="matrixPanel" role="tabpanel" aria-labelledby="matrixTab" hidden>
+          <div class="panel-intro"><div><h3>Identity × resource matrix</h3><p>Each cell shows the current roles found in the review data.</p></div><span class="matrix-legend"><i></i> Privileged role</span></div>
+          <div class="matrix-wrap"><table class="matrix-table" id="matrixTable"></table></div>
+        </section>
+
+        <section id="grantsPanel" role="tabpanel" aria-labelledby="grantsTab" hidden>
+          <div class="panel-intro"><div><h3>Normalized grants</h3><p>The exact assignments used by the analysis rules.</p></div><span id="grantCount"></span></div>
+          <div class="grant-table-wrap"><table class="grant-table"><thead><tr><th>Identity</th><th>Resource</th><th>Role</th><th>Last used</th><th>Owner</th></tr></thead><tbody id="grantRows"></tbody></table></div>
+        </section>
+      </section>
+    </main>
+
+    <dialog id="reviewDialog" aria-labelledby="dialogTitle">
+      <form method="dialog" class="dialog-content">
+        <div class="dialog-header"><div><p class="kicker" id="dialogKind"></p><h2 id="dialogTitle">Review finding</h2></div><button class="close-button" value="close" aria-label="Close review dialog">×</button></div>
+        <p class="finding-summary" id="dialogSummary"></p>
+        <div class="guidance"><span>Suggested control response</span><p id="dialogRecommendation"></p></div>
+        <div><span class="field-label">Affected grants</span><div class="affected-grants" id="dialogGrants"></div></div>
+        <fieldset><legend>Certification decision</legend><div class="decision-options"><label><input type="radio" name="decision" value="retain"> Retain</label><label><input type="radio" name="decision" value="revoke"> Revoke</label><label><input type="radio" name="decision" value="exception"> Exception</label><label><input type="radio" name="decision" value="pending"> Pending</label></div><label class="note-field"><span>Reviewer rationale</span><textarea id="decisionNote" rows="3" placeholder="State the evidence or compensating control"></textarea></label></fieldset>
+        <button id="saveDecisionButton" class="button ink full" value="close">Save review</button>
+      </form>
+    </dialog>
+
+    <dialog id="grantDialog" aria-labelledby="grantDialogTitle">
+      <form class="dialog-content grant-form" id="grantForm">
+        <div class="dialog-header"><div><p class="kicker">Test the policy</p><h2 id="grantDialogTitle">Add an access grant</h2></div><button class="close-button" type="button" id="closeGrantButton" aria-label="Close add grant dialog">×</button></div>
+        <div class="form-grid">
+          <label><span>Identity</span><input name="user" required maxlength="80"></label>
+          <label><span>Department</span><input name="department" required maxlength="60"></label>
+          <label><span>Manager or sponsor</span><input name="manager" maxlength="80"></label>
+          <label><span>Account status</span><select name="accountStatus"><option>active</option><option>disabled</option><option>inactive</option></select></label>
+          <label><span>Account type</span><select name="accountType"><option>employee</option><option>contractor</option><option>service</option></select></label>
+          <label><span>Resource</span><input name="resource" required maxlength="80"></label>
+          <label><span>Role</span><input name="role" required maxlength="80"></label>
+          <label><span>Permission</span><select name="permission"><option>read</option><option>write</option><option>approve</option><option>admin</option><option>owner</option></select></label>
+          <label><span>Access type</span><select name="accessType"><option>permanent</option><option>eligible</option><option>time-bound</option></select></label>
+          <label><span>Last used</span><input name="lastUsed" type="date" required></label>
+          <label class="wide"><span>Resource owner</span><input name="resourceOwner" maxlength="80"></label>
+        </div>
+        <button class="button ink full" type="submit">Add and re-run analysis</button>
+      </form>
+    </dialog>
+
+    <footer><p>Policy checks are transparent examples for portfolio demonstration. Real access certification must follow the organization’s authoritative identity data and approved control policy.</p><a href="https://github.com/drummer475-94" target="_blank" rel="noreferrer">GitHub profile ↗</a></footer>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
