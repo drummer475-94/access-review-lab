@@ -1,6 +1,30 @@
 # Access Review Lab
 
+[![Tests](https://github.com/drummer475-94/access-review-lab/actions/workflows/pages.yml/badge.svg)](https://github.com/drummer475-94/access-review-lab/actions/workflows/pages.yml)
+
 Access Review Lab is a static identity-governance workspace for access certification. It turns CSV or JSON entitlement exports into a searchable finding queue, an identity-by-resource matrix, and a documented review package.
+
+**[Open the live app](https://drummer475-94.github.io/access-review-lab/)**
+
+## 60-second review
+
+1. Start with the ten open findings in the sample certification summary.
+2. Review **Request and approval duties overlap** to see the affected grants and suggested separation-of-duties response.
+3. Record a certification decision, inspect the identity-by-resource matrix, and export the review trail.
+
+The implementation is framework-free, has no runtime dependencies, processes entitlement data locally, and isolates its tested normalization and policy rules in [`core.js`](core.js).
+
+## How it works
+
+```mermaid
+flowchart LR
+  A["CSV or JSON entitlements"] --> B["Normalize grants"]
+  B --> C["Run lifecycle, SoD, dormancy, and privilege checks"]
+  C --> D["Finding queue and access matrix"]
+  D --> E["Certification decision and review export"]
+```
+
+CI enforces at least 95% line coverage, 95% function coverage, and 85% branch coverage for the normalization and policy engine.
 
 ## Portfolio value
 

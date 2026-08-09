@@ -1,5 +1,11 @@
 export const severityRank = { critical: 4, high: 3, medium: 2, low: 1 }
 
+const maxImportedGrants = 5000
+
+function boundedText(value, maximum) {
+  return String(value ?? '').trim().slice(0, maximum)
+}
+
 export const demoGrants = [
   { user: 'Avery Chen', department: 'Finance', manager: 'D. Foster', accountStatus: 'active', accountType: 'employee', resource: 'Ledger Pro', role: 'Finance Requester', permission: 'write', accessType: 'permanent', lastUsed: '2026-08-04', resourceOwner: 'Controller' },
   { user: 'Avery Chen', department: 'Finance', manager: 'D. Foster', accountStatus: 'active', accountType: 'employee', resource: 'Ledger Pro', role: 'Finance Approver', permission: 'approve', accessType: 'permanent', lastUsed: '2026-08-07', resourceOwner: 'Controller' },
@@ -37,19 +43,30 @@ function first(record, keys) {
 export function normalizeGrant(record, index = 0) {
   const input = record && typeof record === 'object' ? record : {}
   return {
-    id: String(input.id || `grant-${index + 1}`),
-    user: first(input, aliases.user) || 'Unknown identity',
-    department: first(input, aliases.department) || 'Unassigned',
-    manager: first(input, aliases.manager),
-    accountStatus: (first(input, aliases.accountStatus) || 'active').toLowerCase(),
-    accountType: (first(input, aliases.accountType) || 'employee').toLowerCase(),
-    resource: first(input, aliases.resource) || 'Unknown resource',
-    role: first(input, aliases.role) || 'Unspecified role',
-    permission: (first(input, aliases.permission) || 'read').toLowerCase(),
-    accessType: (first(input, aliases.accessType) || 'permanent').toLowerCase(),
-    lastUsed: first(input, aliases.lastUsed),
-    resourceOwner: first(input, aliases.resourceOwner),
+    id: boundedText(input.id || `grant-${index + 1}`, 120),
+    user: boundedText(first(input, aliases.user) || 'Unknown identity', 120),
+    department: boundedText(first(input, aliases.department) || 'Unassigned', 80),
+    manager: boundedText(first(input, aliases.manager), 120),
+    accountStatus: boundedText(first(input, aliases.accountStatus) || 'active', 40).toLowerCase(),
+    accountType: boundedText(first(input, aliases.accountType) || 'employee', 40).toLowerCase(),
+    resource: boundedText(first(input, aliases.resource) || 'Unknown resource', 120),
+    role: boundedText(first(input, aliases.role) || 'Unspecified role', 120),
+    permission: boundedText(first(input, aliases.permission) || 'read', 80).toLowerCase(),
+    accessType: boundedText(first(input, aliases.accessType) || 'permanent', 40).toLowerCase(),
+    lastUsed: boundedText(first(input, aliases.lastUsed), 40),
+    resourceOwner: boundedText(first(input, aliases.resourceOwner), 120),
   }
+}
+
+function uniqueGrantIds(grants) {
+  const used = new Set()
+  return grants.map((grant) => {
+    let id = grant.id
+    let suffix = 2
+    while (used.has(id)) { id = `${grant.id}-${suffix}`; suffix += 1 }
+    used.add(id)
+    return id === grant.id ? grant : { ...grant, id }
+  })
 }
 
 function parseCsvLine(line) {
@@ -62,6 +79,7 @@ function parseCsvLine(line) {
       if (quoted && line[index + 1] === '"') { cell += '"'; index += 1 } else quoted = !quoted
     } else if (character === ',' && !quoted) { cells.push(cell.trim()); cell = '' } else cell += character
   }
+  if (quoted) throw new Error('CSV contains an unterminated quoted field.')
   cells.push(cell.trim())
   return cells
 }
@@ -76,14 +94,22 @@ export function parseAccessText(text) {
   } catch {
     const lines = source.split(/\r?\n/).filter((line) => line.trim())
     if (lines.length < 2) throw new Error('Use a JSON array or CSV with a header row.')
-    const headers = parseCsvLine(lines[0])
+    const headers = parseCsvLine(lines[0]).map((header, index) => boundedText(index ? header : header.replace(/^\uFEFF/, ''), 80))
+    if (headers.some((header) => !header) || new Set(headers).size !== headers.length) throw new Error('CSV headers must be non-empty and unique.')
     records = lines.slice(1).map((line) => {
       const values = parseCsvLine(line)
       return Object.fromEntries(headers.map((header, index) => [header, values[index] ?? '']))
     })
   }
-  const grants = records.map(normalizeGrant)
-  if (!grants.length) throw new Error('No access grants were found.')
+  if (!Array.isArray(records) || !records.length) throw new Error('No access grants were found.')
+  if (records.length > maxImportedGrants) throw new Error(`Imports are limited to ${maxImportedGrants} grants.`)
+  if (records.some((record) => !record || typeof record !== 'object' || Array.isArray(record))) {
+    throw new Error('Every grant must be a JSON object or CSV row.')
+  }
+  const grants = uniqueGrantIds(records.map(normalizeGrant))
+  if (grants.some((grant) => grant.user === 'Unknown identity' || grant.resource === 'Unknown resource' || grant.role === 'Unspecified role')) {
+    throw new Error('Every grant needs an identity, resource, and role.')
+  }
   return grants
 }
 
