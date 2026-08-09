@@ -14,6 +14,18 @@ Access Review Lab is a static identity-governance workspace for access certifica
 
 The implementation is framework-free, has no runtime dependencies, processes entitlement data locally, and isolates its tested normalization and policy rules in [`core.js`](core.js).
 
+## How it works
+
+```mermaid
+flowchart LR
+  A["CSV or JSON entitlements"] --> B["Normalize grants"]
+  B --> C["Run lifecycle, SoD, dormancy, and privilege checks"]
+  C --> D["Finding queue and access matrix"]
+  D --> E["Certification decision and review export"]
+```
+
+CI enforces at least 95% line coverage, 95% function coverage, and 85% branch coverage for the normalization and policy engine.
+
 ## Portfolio value
 
 The product makes IAM and governance skills observable: data normalization, identity lifecycle review, least-privilege analysis, segregation of duties, privileged-access review, traceable decisions, and privacy-aware client-side processing.
