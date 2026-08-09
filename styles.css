@@ -37,4 +37,5 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1.5r
 .source-link { font-size: .68rem; font-weight: 850; letter-spacing: .07em; text-transform: uppercase; text-underline-offset: .25rem; }
 .project-meta { display: flex; flex-wrap: wrap; gap: .45rem; margin: 1.15rem 0 0; padding: 0; list-style: none; }
 .project-meta li { border: 1px solid #aeb4c4; border-radius: 999px; background: rgba(255,255,255,.55); padding: .38rem .62rem; color: var(--ink); font-size: .65rem; font-weight: 800; letter-spacing: .035em; }
+.demo-cue { display: block; width: fit-content; margin: .85rem 0 0; border: 0; background: none; padding: 0; color: var(--ink); font-size: .72rem; font-weight: 850; letter-spacing: .025em; text-decoration: underline; text-underline-offset: .22rem; }.demo-cue span { color: var(--blue); }
 @media (max-width: 780px) { .source-link { display: none; } }

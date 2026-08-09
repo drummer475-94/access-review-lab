@@ -1,5 +1,7 @@
 # Access Review Lab
 
+[![Tests](https://github.com/drummer475-94/access-review-lab/actions/workflows/pages.yml/badge.svg)](https://github.com/drummer475-94/access-review-lab/actions/workflows/pages.yml)
+
 Access Review Lab is a static identity-governance workspace for access certification. It turns CSV or JSON entitlement exports into a searchable finding queue, an identity-by-resource matrix, and a documented review package.
 
 **[Open the live app](https://drummer475-94.github.io/access-review-lab/)**

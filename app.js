@@ -4,7 +4,7 @@ const reviewDate = new Date('2026-08-08T12:00:00-04:00')
 const storageKey = 'access-review-lab:decisions:v1'
 const state = { grants: demoGrants.map(normalizeGrant), findings: [], decisions: loadDecisions(), activeFinding: null }
 
-const ids = ['exportButton', 'addGrantButton', 'reviewDate', 'progressText', 'progressBar', 'fileInput', 'importFileButton', 'demoButton', 'loadStatus', 'identityMetric', 'resourceMetric', 'findingMetric', 'reviewedMetric', 'findingsTab', 'matrixTab', 'grantsTab', 'findingsPanel', 'matrixPanel', 'grantsPanel', 'filterForm', 'searchInput', 'kindFilter', 'severityFilter', 'findingRows', 'findingEmpty', 'matrixTable', 'grantCount', 'grantRows', 'reviewDialog', 'dialogKind', 'dialogTitle', 'dialogSummary', 'dialogRecommendation', 'dialogGrants', 'decisionNote', 'saveDecisionButton', 'grantDialog', 'grantForm', 'closeGrantButton']
+const ids = ['exportButton', 'addGrantButton', 'demoCueButton', 'reviewDate', 'progressText', 'progressBar', 'fileInput', 'importFileButton', 'demoButton', 'loadStatus', 'identityMetric', 'resourceMetric', 'findingMetric', 'reviewedMetric', 'findingsTab', 'matrixTab', 'grantsTab', 'findingsPanel', 'matrixPanel', 'grantsPanel', 'filterForm', 'searchInput', 'kindFilter', 'severityFilter', 'findingRows', 'findingEmpty', 'matrixTable', 'grantCount', 'grantRows', 'reviewDialog', 'dialogKind', 'dialogTitle', 'dialogSummary', 'dialogRecommendation', 'dialogGrants', 'decisionNote', 'saveDecisionButton', 'grantDialog', 'grantForm', 'closeGrantButton']
 const element = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]))
 
 function loadDecisions() { try { return JSON.parse(localStorage.getItem(storageKey)) || {} } catch { return {} } }
@@ -167,6 +167,10 @@ function downloadReview() {
 })
 element.filterForm.addEventListener('input', renderFindings)
 element.demoButton.addEventListener('click', () => resetReview(demoGrants, 'Sample directory and review decisions reset.', true))
+element.demoCueButton.addEventListener('click', () => {
+  const finding = state.findings.find((item) => item.kind === 'sod-conflict')
+  if (finding) openReview(finding)
+})
 element.exportButton.addEventListener('click', downloadReview)
 element.saveDecisionButton.addEventListener('click', saveReview)
 element.addGrantButton.addEventListener('click', () => { element.grantForm.reset(); element.grantForm.elements.lastUsed.value = '2026-08-08'; element.grantDialog.showModal() })

@@ -25,6 +25,7 @@ test('validates bounded imports and makes duplicate grant identifiers stable', (
   assert.deepEqual(grants.map((grant) => grant.id), ['same', 'same-2'])
   assert.throws(() => parseAccessText('[{"user":"Alex"}]'), /identity, resource, and role/)
   assert.throws(() => parseAccessText(JSON.stringify(Array.from({ length: 5001 }, () => ({ user: 'Alex', resource: 'Docs', role: 'Reader' })))), /5000 grants/)
+  assert.throws(() => parseAccessText('user,resource,role\nAlex,Console,"unfinished'), /unterminated/)
 })
 
 test('detects lifecycle, segregation, dormancy, and privilege findings', () => {

@@ -79,6 +79,7 @@ function parseCsvLine(line) {
       if (quoted && line[index + 1] === '"') { cell += '"'; index += 1 } else quoted = !quoted
     } else if (character === ',' && !quoted) { cells.push(cell.trim()); cell = '' } else cell += character
   }
+  if (quoted) throw new Error('CSV contains an unterminated quoted field.')
   cells.push(cell.trim())
   return cells
 }
