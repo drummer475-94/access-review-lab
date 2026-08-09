@@ -2,6 +2,16 @@
 
 Access Review Lab is a static identity-governance workspace for access certification. It turns CSV or JSON entitlement exports into a searchable finding queue, an identity-by-resource matrix, and a documented review package.
 
+**[Open the live app](https://drummer475-94.github.io/access-review-lab/)**
+
+## 60-second review
+
+1. Start with the ten open findings in the sample certification summary.
+2. Review **Request and approval duties overlap** to see the affected grants and suggested separation-of-duties response.
+3. Record a certification decision, inspect the identity-by-resource matrix, and export the review trail.
+
+The implementation is framework-free, has no runtime dependencies, processes entitlement data locally, and isolates its tested normalization and policy rules in [`core.js`](core.js).
+
 ## Portfolio value
 
 The product makes IAM and governance skills observable: data normalization, identity lifecycle review, least-privilege analysis, segregation of duties, privileged-access review, traceable decisions, and privacy-aware client-side processing.

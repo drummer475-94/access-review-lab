@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f4f0e8">
     <meta name="description" content="A browser-based identity access review workspace for least-privilege and separation-of-duties analysis.">
+    <meta name="referrer" content="no-referrer">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self'">
     <title>Access Review Lab | Identity Governance</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css">
@@ -15,6 +17,7 @@
       <a class="brand" href="#top"><span class="brand-symbol" aria-hidden="true">AR</span><span><strong>Access Review Lab</strong><small>Identity governance workspace</small></span></a>
       <div class="top-actions">
         <span class="local-note">Data stays in this browser</span>
+        <a class="source-link" href="https://github.com/drummer475-94/access-review-lab" target="_blank" rel="noreferrer">Source code <span aria-hidden="true">↗</span></a>
         <button class="button outline" id="exportButton" type="button">Export review</button>
         <button class="button ink" id="addGrantButton" type="button">Add grant</button>
       </div>
@@ -26,6 +29,7 @@
           <p class="kicker">Quarterly access certification / Q3</p>
           <h1 id="pageTitle">Make every access decision explainable.</h1>
           <p>Inspect who has access to what, surface toxic combinations and stale privileges, then leave a review trail that another person can follow.</p>
+          <ul class="project-meta" aria-label="Engineering highlights"><li>Vanilla JavaScript</li><li>Zero runtime dependencies</li><li>Tested policy rules</li></ul>
         </div>
         <aside class="review-card" aria-label="Review progress">
           <div><span>Review date</span><strong id="reviewDate"></strong></div>
@@ -115,7 +119,7 @@
       </form>
     </dialog>
 
-    <footer><p>Policy checks are transparent examples for portfolio demonstration. Real access certification must follow the organization’s authoritative identity data and approved control policy.</p><a href="https://github.com/drummer475-94" target="_blank" rel="noreferrer">GitHub profile ↗</a></footer>
+    <footer><p>Policy checks are transparent examples for portfolio demonstration. Real access certification must follow the organization’s authoritative identity data and approved control policy.</p><a href="https://github.com/drummer475-94/access-review-lab" target="_blank" rel="noreferrer">Review the source ↗</a></footer>
     <script type="module" src="app.js"></script>
   </body>
 </html>

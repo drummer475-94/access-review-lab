@@ -17,6 +17,16 @@ test('parses JSON and quoted CSV access exports', () => {
   assert.equal(parseAccessText(csv)[0].role, 'Requester, Tier 2')
 })
 
+test('validates bounded imports and makes duplicate grant identifiers stable', () => {
+  const grants = parseAccessText(JSON.stringify([
+    { id: 'same', user: 'Alex', resource: 'Console', role: 'Reader' },
+    { id: 'same', user: 'Alex', resource: 'Docs', role: 'Editor' },
+  ]))
+  assert.deepEqual(grants.map((grant) => grant.id), ['same', 'same-2'])
+  assert.throws(() => parseAccessText('[{"user":"Alex"}]'), /identity, resource, and role/)
+  assert.throws(() => parseAccessText(JSON.stringify(Array.from({ length: 5001 }, () => ({ user: 'Alex', resource: 'Docs', role: 'Reader' })))), /5000 grants/)
+})
+
 test('detects lifecycle, segregation, dormancy, and privilege findings', () => {
   const grants = demoGrants.map(normalizeGrant)
   const findings = analyzeAccess(grants, reviewDate)
