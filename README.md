@@ -4,6 +4,7 @@
 [![Test Coverage](https://img.shields.io/badge/coverage-99%25-brightgreen.svg)](https://github.com/drummer475-94/access-review-lab)
 [![Compliance Controls](https://img.shields.io/badge/Compliance-SOX%20404%20%7C%20SOC%202%20%7C%20CIS%20v8-blue.svg)](https://www.cisecurity.org/controls)
 [![Least Privilege Engine](https://img.shields.io/badge/IAM-Least%20Privilege%20Engine-orange.svg)](https://www.cisa.gov/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Access Review Lab is an enterprise identity governance and access certification workbench. It parses native enterprise IAM export formats (Entra ID / Azure AD and Okta), tags access risks against SOX 404, SOC 2 (CC6.1–CC6.3), and CIS Controls v8 (Controls 5 & 6), and provides an automated Least-Privilege Recommendation Engine featuring privilege risk scoring, role right-sizing, toxic combination detection, and dormant user cleanup.
 
